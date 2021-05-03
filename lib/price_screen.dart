@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +11,38 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  // CoinData coinPrice = CoinData();
   String selectedCurrency = 'USD';
+  String bitCoin = 'BTC';
+  String etherium = 'ETH';
+  String liteCoin = 'LTC';
+  String btcPrice;
+  String ethPrice;
+  String ltcPrice;
+  dynamic btcData() async {
+    var priceData = await CoinData().getCoinData(bitCoin, selectedCurrency);
+    var longBtcPrice = (priceData['rate']);
+    setState(() {
+      btcPrice = longBtcPrice.toStringAsFixed(3);
+    });
+  }
+
+  dynamic ethData() async {
+    var ethpriceData = await CoinData().getCoinData(etherium, selectedCurrency);
+    var longEthPrice = (ethpriceData['rate']);
+    setState(() {
+      ethPrice = longEthPrice.toStringAsFixed(3);
+    });
+  }
+
+  dynamic ltcData() async {
+    var ltcpriceData = await CoinData().getCoinData(liteCoin, selectedCurrency);
+    var longLtcPrice = (ltcpriceData['rate']);
+    setState(() {
+      ltcPrice = longLtcPrice.toStringAsFixed(3);
+    });
+  }
+
 //android dropdown button
   DropdownButton<String> androidDropdownButton() {
     List<DropdownMenuItem<String>> DropdownItem = [];
@@ -66,6 +99,15 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    btcData();
+    ethData();
+    ltcData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +128,49 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '$selectedCurrency',
+                  'BTC: $btcPrice $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlue,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  'ETH: $ethPrice $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlue,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  'LTC: $ltcPrice $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
