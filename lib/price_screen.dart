@@ -19,6 +19,15 @@ class _PriceScreenState extends State<PriceScreen> {
   String btcPrice;
   String ethPrice;
   String ltcPrice;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    btcData();
+    ethData();
+    ltcData();
+  }
+
   dynamic btcData() async {
     var priceData = await CoinData().getCoinData(bitCoin, selectedCurrency);
     var longBtcPrice = (priceData['rate']);
@@ -60,6 +69,9 @@ class _PriceScreenState extends State<PriceScreen> {
         print(value);
         setState(() {
           selectedCurrency = value;
+          btcData();
+          ethData();
+          ltcData();
         });
       },
     );
@@ -84,6 +96,9 @@ class _PriceScreenState extends State<PriceScreen> {
         print(currenciesList[seletedIndex]);
         setState(() {
           selectedCurrency = currenciesList[seletedIndex];
+          btcData();
+          ethData();
+          ltcData();
         });
       },
     );
@@ -96,15 +111,6 @@ class _PriceScreenState extends State<PriceScreen> {
     } else if (Platform.isAndroid) {
       return androidDropdownButton();
     }
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    btcData();
-    ethData();
-    ltcData();
   }
 
   @override
