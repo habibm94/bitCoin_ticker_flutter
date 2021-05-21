@@ -1,9 +1,10 @@
-import 'dart:convert';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
+import 'const.dart';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -11,45 +12,32 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  // CoinData coinPrice = CoinData();
-  String selectedCurrency = 'USD';
-  String bitCoin = 'BTC';
-  String etherium = 'ETH';
-  String liteCoin = 'LTC';
-  String btcPrice;
-  String ethPrice;
-  String ltcPrice;
-  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    btcData();
-    ethData();
-    ltcData();
+    coinPrice();
   }
 
-  dynamic btcData() async {
-    var priceData = await CoinData().getCoinData(bitCoin, selectedCurrency);
-    var longBtcPrice = (priceData['rate']);
-    setState(() {
-      btcPrice = longBtcPrice.toStringAsFixed(3);
-    });
-  }
-
-  dynamic ethData() async {
-    var ethpriceData = await CoinData().getCoinData(etherium, selectedCurrency);
-    var longEthPrice = (ethpriceData['rate']);
-    setState(() {
-      ethPrice = longEthPrice.toStringAsFixed(3);
-    });
-  }
-
-  dynamic ltcData() async {
-    var ltcpriceData = await CoinData().getCoinData(liteCoin, selectedCurrency);
-    var longLtcPrice = (ltcpriceData['rate']);
-    setState(() {
-      ltcPrice = longLtcPrice.toStringAsFixed(3);
-    });
+  List<String> coinValues = [];
+  String selectedCurrency = 'USD';
+  Future<dynamic> coinPrice() async {
+    try {
+      for (String coin in cryptoList) {
+        var priceData = await CoinData().getCoinData(coin, selectedCurrency);
+        var longCoinPrice = (priceData['rate']);
+        var shortCoinPrice = longCoinPrice.toStringAsFixed(3);
+        setState(() {
+          coinValues.add(shortCoinPrice);
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+      for (String cryptos in cryptoList) {
+        var error = 'networkError';
+        setState(() {
+          coinValues.add(error);
+        });
+      }
+    }
   }
 
 //android dropdown button
@@ -66,12 +54,11 @@ class _PriceScreenState extends State<PriceScreen> {
       value: selectedCurrency,
       items: DropdownItem,
       onChanged: (value) {
-        print(value);
         setState(() {
           selectedCurrency = value;
-          btcData();
-          ethData();
-          ltcData();
+          coinValues.clear();
+          coinPrice();
+          print(selectedCurrency);
         });
       },
     );
@@ -85,8 +72,8 @@ class _PriceScreenState extends State<PriceScreen> {
       pickerItems.add(newItem);
     }
     return CupertinoPicker(
-      backgroundColor: Colors.white30,
-      magnification: 1.5,
+      backgroundColor: kIospickerBackgroundColor,
+      magnification: kIospickerMagnifier,
       useMagnifier: true,
       looping: true,
       children: pickerItems,
@@ -96,9 +83,10 @@ class _PriceScreenState extends State<PriceScreen> {
         print(currenciesList[seletedIndex]);
         setState(() {
           selectedCurrency = currenciesList[seletedIndex];
-          btcData();
-          ethData();
-          ltcData();
+          // btcData();
+          // ethData();
+          // ltcData();
+          coinPrice();
         });
       },
     );
@@ -117,78 +105,49 @@ class _PriceScreenState extends State<PriceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('🤑 Coin Ticker'),
+        title: kAppBarTitle,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlue,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  'BTC: $btcPrice $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlue,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  'ETH: $ethPrice $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlue,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  'LTC: $ltcPrice $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
           Container(
-            height: 100.0,
-            alignment: Alignment.center,
+              height: kBodyContainerHeight,
+              padding: EdgeInsets.fromLTRB(10, 20, 10, 50),
+              child: coinValues.length != cryptoList.length
+                  ? SpinKitPouringHourglass(
+                      color: kSpinKitColor,
+                      size: kSpinkitSize,
+                    )
+                  : ListView.builder(
+                      itemCount: cryptoList.length,
+                      itemBuilder: (BuildContext ctx, int index) {
+                        return Padding(
+                          padding: EdgeInsets.fromLTRB(18.0, 5.0, 18.0, 5),
+                          child: Card(
+                            color: kListCardcolor,
+                            elevation: 5.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15.0, horizontal: 28.0),
+                              child: Text(
+                                '${cryptoList[index]}: ${coinValues[index]} $selectedCurrency',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: kListCardTextSize,
+                                  color: kListCardTextcolor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      })),
+          Container(
+            height: kBottomContainerSize,
+            alignment: kBottomContainerAlignMent,
             // padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.blueAccent,
             child: Padding(
@@ -201,3 +160,26 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 }
+// dynamic btcData() async {
+//   var priceData = await CoinData().getCoinData(bitCoin, selectedCurrency);
+//   var longBtcPrice = (priceData['rate']);
+//   setState(() {
+//     btcPrice = longBtcPrice.toStringAsFixed(3);
+//   });
+// }
+//
+// dynamic ethData() async {
+//   var ethpriceData = await CoinData().getCoinData(etherium, selectedCurrency);
+//   var longEthPrice = (ethpriceData['rate']);
+//   setState(() {
+//     ethPrice = longEthPrice.toStringAsFixed(3);
+//   });
+// }
+//
+// dynamic ltcData() async {
+//   var ltcpriceData = await CoinData().getCoinData(liteCoin, selectedCurrency);
+//   var longLtcPrice = (ltcpriceData['rate']);
+//   setState(() {
+//     ltcPrice = longLtcPrice.toStringAsFixed(3);
+//   });
+// }
