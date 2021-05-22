@@ -4,6 +4,7 @@ import 'dart:convert';
 class NetworkHelper {
   final dynamic url;
   NetworkHelper(this.url);
+  //will fetch data from net and json decode it and return
   Future getData() async {
     http.Response response = await http.get(url);
     if (response.statusCode == 200) {

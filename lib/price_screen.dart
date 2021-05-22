@@ -14,11 +14,13 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   void initState() {
     super.initState();
-    coinPrice();
+    coinPrice(); //callin the method at the start of state creation
   }
 
-  List<String> coinValues = [];
-  String selectedCurrency = 'USD';
+  List<String> coinValues = []; //list from crypto currency values from net
+  String selectedCurrency =
+      'USD'; //usd as default- will change as user selects from dropdown
+  //main function here- fetch the coin price with help of coinData method from cin_data and set to coinvalue varialbe
   Future<dynamic> coinPrice() async {
     try {
       for (String coin in cryptoList) {
@@ -32,7 +34,8 @@ class _PriceScreenState extends State<PriceScreen> {
     } catch (e) {
       print(e.toString());
       for (String cryptos in cryptoList) {
-        var error = 'networkError';
+        var error =
+            'networkError'; //will show error in every card if goes wrong calling
         setState(() {
           coinValues.add(error);
         });
@@ -83,9 +86,7 @@ class _PriceScreenState extends State<PriceScreen> {
         print(currenciesList[seletedIndex]);
         setState(() {
           selectedCurrency = currenciesList[seletedIndex];
-          // btcData();
-          // ethData();
-          // ltcData();
+
           coinPrice();
         });
       },
@@ -160,26 +161,3 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 }
-// dynamic btcData() async {
-//   var priceData = await CoinData().getCoinData(bitCoin, selectedCurrency);
-//   var longBtcPrice = (priceData['rate']);
-//   setState(() {
-//     btcPrice = longBtcPrice.toStringAsFixed(3);
-//   });
-// }
-//
-// dynamic ethData() async {
-//   var ethpriceData = await CoinData().getCoinData(etherium, selectedCurrency);
-//   var longEthPrice = (ethpriceData['rate']);
-//   setState(() {
-//     ethPrice = longEthPrice.toStringAsFixed(3);
-//   });
-// }
-//
-// dynamic ltcData() async {
-//   var ltcpriceData = await CoinData().getCoinData(liteCoin, selectedCurrency);
-//   var longLtcPrice = (ltcpriceData['rate']);
-//   setState(() {
-//     ltcPrice = longLtcPrice.toStringAsFixed(3);
-//   });
-// }
